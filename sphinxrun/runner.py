@@ -4,42 +4,54 @@ import pickle as pkl
 import socket
 import subprocess
 import sys
+import textwrap
+import weakref
+from multiprocessing.connection import Connection
 from tempfile import NamedTemporaryFile
 
-import docutils
 
-_outputs = []
-
-
-def show(node: docutils.nodes.Node):
-    """Insert a node in the document."""
-    _outputs.append(node)
-
-
-def dump():
-    """Called by the runner process to export shown nodes."""
-    with open(os.environ["SPHINXRUN_OUTPUT"], "wb") as f:
-        pkl.dump(_outputs, f)
-
-
-def run(setupcode, code, static_path) -> list[docutils.nodes.Node]:
-    """Execute the code and return generated docutils nodes."""
-    with NamedTemporaryFile("w+") as script, NamedTemporaryFile("rb") as dumpfile:
-        # Write code to a temporary script file
-        script.write(setupcode + "\n")
-        script.write(code + "\n")
-        script.write("\n".join(["import sphinxrun.runner", "sphinxrun.runner.dump()"]))
-        script.flush()
-
-        # Run the code in a separate python process
-        env = os.environ.copy()
-        env["SPHINXRUN_OUTPUT"] = dumpfile.name
-        p = subprocess.run(
-            [sys.executable, script.name], capture_output=True, text=True, env=env
+class Runner:
+    def __init__(self):
+        self.pipe, child_pipe = multiprocessing.Pipe()
+        self.proc = multiprocessing.Process(
+            target=Runner.loop, args=[self.pipe, child_pipe]
         )
+        self.proc.start()
+        child_pipe.close()
 
-        # Reload dumped nodes
-        dumpfile.flush()
-        explicit_nodes = pkl.load(dumpfile)
+    @staticmethod
+    def loop(parent_pipe: Connection, pipe: Connection):
+        parent_pipe.close()
 
-    return explicit_nodes, p.stdout
+        globals = {}
+        locals = {}
+
+        exec("import sphinxrun", globals, locals)
+
+        while True:
+            try:
+                todo = pipe.recv()
+            except EOFError:
+                break
+
+            with NamedTemporaryFile("r") as f:
+                os.environ["SPHINXRUN_OUTPUT"] = f.name
+
+                exec(todo, globals, locals)
+
+                pipe.send(f.read())
+
+    def __del__(self):
+        self.stop()
+
+    def stop(self):
+        if self.proc.is_alive():
+            self.proc.terminate()
+
+        self.proc.join()
+
+    def submit(self, code):
+        self.pipe.send(code)
+        out = self.pipe.recv()
+
+        return out

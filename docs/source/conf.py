@@ -1,3 +1,9 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+
+
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:

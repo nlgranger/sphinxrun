@@ -1,3 +1,2 @@
-from . import demo
-from .directives import setup
-from .runner import show
+from .directive import setup
+from .show import show

@@ -1,33 +1,40 @@
 [build-system]
-requires = [
-  "setuptools >= 40.9.0",
-]
 build-backend = "setuptools.build_meta"
-
-[project]
-name = "sphinxrun"
-version = "0.1.0"
-description = "Dynamically generated content for sphinx documentations"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-    "matplotlib>=3.10.5",
-    "sphinx>=8.2.3",
+requires = [
+    "setuptools >= 40.9.0",
 ]
 
 [dependency-groups]
-dev = ["ruff>=0.12.8"]
+dev = [
+    "ruff>=0.12.8",
+]
 
-[tool.setuptools.packages.find]
-include = ["sphinxrun"]
+[project]
+dependencies = [
+    "sphinx>=8.2.3",
+]
+description = "Dynamically generated content for sphinx documentations"
+name = "sphinxrun"
+readme = "README.md"
+requires-python = ">=3.9"
+version = "0.1.0"
 
 [tool.ruff]
-line-length = 88
 indent-width = 4
+line-length = 88
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["I"]
+fixable = [
+    "ALL",
+]
 ignore = []
-fixable = ["ALL"]
+select = [
+    "I",
+]
 unfixable = []
+
+[tool.setuptools.packages.find]
+include = [
+    "sphinxrun",
+]
