@@ -22,7 +22,6 @@ release = "0.0.1"
 
 extensions = ["sphinx.ext.autodoc", "sphinxrun"]
 
-templates_path = ["_templates"]
 exclude_patterns = []
 
 
@@ -30,7 +29,6 @@ exclude_patterns = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
-html_static_path = ["_static"]
 html_theme_options = {
     # Disable showing the sidebar. Defaults to 'false'
     "nosidebar": True,
