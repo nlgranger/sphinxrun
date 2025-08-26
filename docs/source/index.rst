@@ -8,7 +8,7 @@ SphinxRun documentation
 =======================
 
 SphinxRun registers a new :rst:dir:`.. run:: <run>` directive to execute python commands dynamically while building a sphinx documentation.
-It can be used to generate documentation artifacts such as figures or to dynamic content.
+It can be used to generate documentation artifacts such as figures or to insert dynamic content.
 
 Example
 -------

@@ -1,48 +1,62 @@
 # Sphinxrun
 
-Prototype for a sphinx extension which executes code and inserts the generated content in a sphinx documentation.
+SphinxRun registers a new `.. run::` directive to execute python commands dynamically while building a sphinx documentation.
+It can be used to generate documentation artifacts such as figures or to insert dynamic content.
 
-Example:
+## Example:
 
 ```py
-class Demo:
-    """Demo class.
+import textwrap
 
-    The setup code is executed before all run codes for the current document.
 
-    .. runsetup::
+class Wrapper:
+    """Wrapper class.
 
-        import sphinxrun
-        from docutils import nodes
+    .. run::
+
+        from example import Wrapper
+
+        d = Wrapper()
+
+        with open("docs/source/lorem.txt") as f:
+            text = f.read()
     """
 
-    def a(self):
-        """a method
-
-        Explicitly export a node to insert in the document.
+    def wrap70(self, text):
+        """Wrap text to 70 columns.
 
         .. run::
 
-            sphinxrun.show(nodes.paragraph(text='hello world from A.a()!'))
+            output = d.wrap70(text)
+
+            sphinxrun.show(output)
         """
-        return "A.a return value"
-
-    def b(self):
-        """b method
-
-        Alternatively, write rst markup to stdout.
-
-        .. run::
-
-            print(r'''Hello world from `A.b()`!
-
-            .. note::
-                This is a printed note.
-            ''')
-        """
-        return 1
+        return textwrap.fill(text)
 ```
 
-Renders like this:
+renders as:
 
 ![rendered doc screenshot](example.jpg)
+
+## Installation
+
+Install the package:
+
+```sh
+pip install sphinxrun
+# or
+uv add --dev sphinxrun
+```
+
+Then add the extension to the sphinx configuration:
+
+```py
+   extensions = [
+      ...
+      "sphinxrun"
+   ]
+```
+
+## Documentation
+
+The documentation is hosted at: https://sphinxrun.readthedocs.io/en/latest/
